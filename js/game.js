@@ -135,16 +135,18 @@ var update = function (modifier) {
 				break;
 		}
 
-	}
 	if (
-		hero.x <= (monster.x + 32)
-		&& monster.x <= (hero.x + 32)
-		&& hero.y <= (monster.y + 32)
-		&& monster.y <= (hero.y + 32)
+		paintballs[i].x <= (monster.x + 15)
+		&& monster.x <= (paintballs[i].x + 15)
+		&& paintballs[i].y <= (monster.y + 15)
+		&& monster.y <= (paintballs[i].y + 15)
 	) {
 		++monstersCaught;
 		reset();
 	}
+
+	}
+
 };
 
 // Draw everything
