@@ -112,28 +112,28 @@ var update = function (modifier) {
 	//This code but with each bullet
 	for(var i=0; i<paintballcount; i++)
 	{
-		switch(paintballs[i].direction)
-		{
-			case DUP:
-				console.log("up");
-				paintballs[i].y=*10*modifier;
-				break;
-			case DDOWN:
-				console.log("down");
-				paintballs[i].y=*-10*modifier;
-				break;
-			case DLEFT:
-				console.log("left");
-				paintballs[i].x=*-10*modifier;
-				break;
-			case DRIGHT:
-				console.log("right");
-				paintballs[i].x=10*modifier;
-				break;
-			defualt:
-				alert("FUCL");
-				break;
-		}
+//		switch(paintballs[i].direction)
+//		{
+//			case DUP:
+//				console.log("up");
+//				paintballs[i].y=*10*modifier;
+//				break;
+//			case DDOWN:
+//				console.log("down");
+//				paintballs[i].y=*-10*modifier;
+//				break;
+//			case DLEFT:
+//				console.log("left");
+//				paintballs[i].x=*-10*modifier;
+//				break;
+//			case DRIGHT:
+//				console.log("right");
+//				paintballs[i].x=10*modifier;
+//				break;
+//			defualt:
+//				alert("FUCL");
+//				break;
+//		}
 
 	}
 	if (
