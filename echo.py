@@ -5,6 +5,7 @@ import tornado.websocket
 import tornado.ioloop
 
 players = []
+clients = []
 # This is our WebSocketHandler - it handles the messages
 # from the tornado server
 def init_players():
@@ -26,13 +27,17 @@ class WebSocketHandler(tornado.websocket.WebSocketHandler):
     self.write_message("You are connected")
     choice  = init_players()
     self.write_message(choice)
+    clients.append(self);
 
-  # the client sent the message
+  #This broadcasts the message to all clients
   def on_message(self, message):
-    pass
+    for client in clients:
+      print(message)
+      client.write_message(message)
 
   # client disconnected
   def on_close(self):
+    clients.remove(self)
     print "Client disconnected"
 
 # start a new WebSocket Application

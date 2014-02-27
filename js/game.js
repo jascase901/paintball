@@ -10,8 +10,10 @@ DDOWN=1;
 DLEFT=2;
 DRIGHT=3;
 //Set up Web Socket
-var ws = new WebSocket("ws://localhost:8888");
+var ws = new WebSocket("ws://128.111.43.31:8888");
 
+
+//window.onload= function (){ var ws = new WebSocket("ws://localhost:8888");};
 
 // Background image
 var bgReady = false;
@@ -50,7 +52,8 @@ monsterImage.src = "images/monster.png";
 
 // Game objects
 var hero = {
-  speed: 256 // movement in pixels per second
+  speed: 256, // movement in pixels per second
+  id : "0"
 };
 
 var paintball= {
@@ -62,8 +65,8 @@ paintballcount = 0;
 
 
 var monster = {
-  speed: 400
-
+  speed: 400,
+  id : "1"
 };
 var monstersCaught = 0;
 
@@ -87,45 +90,80 @@ var reset = function () {
   monster.x = 32 + (Math.random() * (canvas.width - 64));
   monster.y = 32 + (Math.random() * (canvas.height - 64));
 };
-
+player=hero;
 //WebSocket event loop
 ws.onmessage = function (evt) {
   if(evt.data=="hero"){
     alert("server chose hero");
-    mover = hero
+    player = hero;
   }
   if (evt.data=="monster"){
     alert("server chose monster");
-    mover = monster
+    player = monster;
   };
+
+  //Update Character positions
+  if (evt.data[0]==hero.id && player.id!=hero.id)
+  {
+
+    if(evt.data[1]=="X")
+    {
+      //This converts the string to a number
+      hero.x=1*evt.data.substring(2);
+    }
+    if(evt.data[1]=="Y")
+    {
+      //This converts the string to a number
+      hero.y=1*evt.data.substring(2);
+    }
+  }
+  if (evt.data[0]==monster.id && player.id!=monster.id)
+  {
+
+    if(evt.data[1]=="X")
+    {
+      //This converts the string to a number
+      monster.x=1*evt.data.substring(2);
+    }
+    if(evt.data[1]=="Y")
+    {
+      //This converts the string to a number
+      monster.y=1*evt.data.substring(2);
+    }
+  }
 };
 
 // Update game objects
 var update = function (modifier) {
   if (38 in keysDown) { // Player holding up
-    mover.y -= mover.speed * modifier;
-    mover.direction = DUP;
+    player.y -= player.speed * modifier;
+    player.direction = DUP;
   }
   if (40 in keysDown) { // Player holding down
-    mover.y += mover.speed * modifier;
-    mover.direction = DDOWN;
+    player.y += player.speed * modifier;
+    player.direction = DDOWN;
   }
   if (37 in keysDown) { // Player holding left
-    mover.x -= mover.speed * modifier;
-    mover.direction = DLEFT;
+    player.x -= player.speed * modifier;
+    player.direction = DLEFT;
   }
   if (39 in keysDown) { // Player holding right
-    mover.x += mover.speed * modifier;
-    mover.direction = DRIGHT;
+    player.x += player.speed * modifier;
+    player.direction = DRIGHT;
   }
   if (32 in keysDown){//Player is pressing Space
-    paintball.x = mover.x;
-    paintball.y = mover.y;
+    paintball.x = player.x;
+    paintball.y = player.y;
 
     //append bullet to bullet list
-    paintballs.push({x: mover.x, y: mover.y,direction: mover.direction});
+    paintballs.push({x: player.x, y: player.y,direction: player.direction});
     paintballcount++;
   }
+
+
+  ws.send(player.id+"X"+player.x);
+  ws.send(player.id+"Y"+player.y);
+
 
   // Are they touching?
   //This code but with each bullet
