@@ -74,6 +74,8 @@ paintballs= {
 
 var monster = {
   id : "1",
+  balls:[],
+  paintballcount : 0,
   speed: 400
 };
 var monstersCaught = 0;
@@ -116,17 +118,14 @@ ws.onmessage = function (evt) {
 		try
 		{
 			jsonData = JSON.parse(evt.data);
-			if(jsonData.id==monster.id)
+			if(jsonData.id==monster.id && player.id!=monster.id)
 			{
 				monster=jsonData;
 			}
-			if(jsonData.id==hero.id)
+			if(jsonData.id==hero.id && player.id!=hero.id)
 			{
 				hero=jsonData;
 			}
-      if(jsonData.id==paintballs.id){
-        paintballs =jsonData;
-      }
 		}
 		catch(e)
 		{
@@ -157,35 +156,34 @@ var update = function (modifier) {
     paintball.y = player.y;
 
     //append bullet to bullet list
-    paintballs.balls.push({x: player.x, y: player.y,direction: player.direction});
-    paintballs.paintballcount++;
+    player.balls.push({x: player.x, y: player.y,direction: player.direction});
+    player.paintballcount++;
   }
 
 
   ws.send(JSON.stringify(player));
-  ws.send(JSON.stringify(paintballs));
 
 
   // Are they touching?
   //This code but with each bullet
-  for(var i=0; i<paintballs.paintballcount; i++)
+  for(var i=0; i<player.paintballcount; i++)
   {
-    switch(paintballs.balls[i].direction)
+    switch(player.balls[i].direction)
     {
     case DUP:
-      paintballs.balls[i].y-=230*modifier;
+      player.balls[i].y-=230*modifier;
       console.log("up");
       break;
     case DDOWN:
-      paintballs.balls[i].y+=230*modifier;
+      player.balls[i].y+=230*modifier;
       console.log("down");
       break;
     case DLEFT:
-      paintballs.balls[i].x-=230*modifier;
+      player.balls[i].x-=230*modifier;
       console.log("left");
       break;
     case DRIGHT:
-      paintballs.balls[i].x+=230*modifier;
+      player.balls[i].x+=230*modifier;
       console.log("right");
       break;
       defualt:
@@ -194,10 +192,10 @@ var update = function (modifier) {
     }
 
   if (
-    paintballs.balls[i].x <= (monster.x + 15)
-    && monster.x <= (paintballs.balls[i].x + 15)
-    && paintballs.balls[i].y <= (monster.y + 15)
-    && monster.y <= (paintballs.balls[i].y + 15)
+    player.balls[i].x <= (monster.x + 15)
+    && monster.x <= (player.balls[i].x + 15)
+    && player.balls[i].y <= (monster.y + 15)
+    && monster.y <= (player.balls[i].y + 15)
   ) {
     ++monstersCaught;
     // reset();
@@ -218,9 +216,13 @@ var render = function () {
   }
 
   if (paintballReady) {
-    for(var i=0;i<paintballs.paintballcount;i++)
+    for(var i=0;i<hero.paintballcount;i++)
     {
-      ctx.drawImage(paintballImage, paintballs.balls[i].x, paintballs.balls[i].y);
+      ctx.drawImage(paintballImage, hero.balls[i].x, hero.balls[i].y);
+    }
+    for(var i=0;i<monster.paintballcount;i++)
+    {
+      ctx.drawImage(paintballImage, monster.balls[i].x, monster.balls[i].y);
     }
   }
 
