@@ -54,8 +54,8 @@ monsterImage.src = "images/monster.png";
 
 // Game objects
 var hero = {
-  speed: 256, // movement in pixels per second
-  id : "0"
+  id : "0",
+  speed: 256 // movement in pixels per second
 };
 
 var paintball= {
@@ -67,8 +67,8 @@ paintballcount = 0;
 
 
 var monster = {
-  speed: 400,
-  id : "1"
+  id : "1",
+  speed: 400
 };
 var monstersCaught = 0;
 
@@ -105,34 +105,26 @@ ws.onmessage = function (evt) {
   };
 
   //Update Character positions
-  if (evt.data[0]==hero.id && player.id!=hero.id)
-  {
+	try
+	{
+		JSON.parse(evt.data);
 
-    if(evt.data[1]=="X")
-    {
-      //This converts the string to a number
-      hero.x=1*evt.data.substring(2);
-    }
-    if(evt.data[1]=="Y")
-    {
-      //This converts the string to a number
-      hero.y=1*evt.data.substring(2);
-    }
-  }
-  if (evt.data[0]==monster.id && player.id!=monster.id)
-  {
-
-    if(evt.data[1]=="X")
-    {
-      //This converts the string to a number
-      monster.x=1*evt.data.substring(2);
-    }
-    if(evt.data[1]=="Y")
-    {
-      //This converts the string to a number
-      monster.y=1*evt.data.substring(2);
-    }
-  }
+		jsonData = eval(evt.data);
+		if(jsonData.id==monster.id)
+		{
+			alert("monster")
+			monster=jsonData;
+		}
+		if(jsonData.id==hero.id)
+		{
+			alert("hero")
+			hero=jsonData;
+		}
+	}
+	catch(e)
+	{
+	}
+ 
 };
 
 // Update game objects
@@ -163,8 +155,7 @@ var update = function (modifier) {
   }
 
 
-  ws.send(player.id+"X"+player.x);
-  ws.send(player.id+"Y"+player.y);
+  ws.send(JSON.stringify(player));
 
 
   // Are they touching?
