@@ -9,8 +9,10 @@ DUP=0;
 DDOWN=1;
 DLEFT=2;
 DRIGHT=3;
+//Ugly Alert Box that allows user to chose server
+var serverIp = prompt("Please enter server ip.", "localhost");
 //Set up Web Socket
-var ws = new WebSocket("ws://128.111.43.31:8888");
+var ws = new WebSocket("ws://"+serverIp+":8888");
 
 
 //window.onload= function (){ var ws = new WebSocket("ws://localhost:8888");};
