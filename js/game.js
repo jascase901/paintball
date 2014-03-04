@@ -54,8 +54,8 @@ monsterImage.src = "images/monster.png";
 
 // Game objects
 var hero = {
-  speed: 256, // movement in pixels per second
-  id : "0"
+  id : "0",
+  speed: 256 // movement in pixels per second
 };
 
 var paintball= {
@@ -67,8 +67,8 @@ paintballcount = 0;
 
 
 var monster = {
-  speed: 400,
-  id : "1"
+  id : "1",
+  speed: 400
 };
 var monstersCaught = 0;
 
@@ -85,56 +85,46 @@ addEventListener("keyup", function (e) {
 
 // Reset the game when the player catches a monster
 var reset = function () {
-  hero.x = canvas.width / 2;
-  hero.y = canvas.height / 2;
+	hero.x = canvas.width / 2;
+	hero.y = canvas.height / 2;
 
-  // Throw the monster somewhere on the screen randomly
-  monster.x = 32 + (Math.random() * (canvas.width - 64));
-  monster.y = 32 + (Math.random() * (canvas.height - 64));
+	// Throw the monster somewhere on the screen randomly
+	monster.x = 32 + (Math.random() * (canvas.width - 64));
+	monster.y = 32 + (Math.random() * (canvas.height - 64));
 };
 player=hero;
 //WebSocket event loop
 ws.onmessage = function (evt) {
-  if(evt.data=="hero"){
-    alert("server chose hero");
-    player = hero;
-  }
-  if (evt.data=="monster"){
-    alert("server chose monster");
-    player = monster;
-  };
+	if(evt.data=="hero"){
+		alert("server chose hero");
+		player = hero;
+	}
+	else if (evt.data=="monster"){
+		alert("server chose monster");
+		player = monster;
+	}
+	else
+	{
 
-  //Update Character positions
-  if (evt.data[0]==hero.id && player.id!=hero.id)
-  {
-
-    if(evt.data[1]=="X")
-    {
-      //This converts the string to a number
-      hero.x=1*evt.data.substring(2);
-    }
-    if(evt.data[1]=="Y")
-    {
-      //This converts the string to a number
-      hero.y=1*evt.data.substring(2);
-    }
-  }
-  if (evt.data[0]==monster.id && player.id!=monster.id)
-  {
-
-    if(evt.data[1]=="X")
-    {
-      //This converts the string to a number
-      monster.x=1*evt.data.substring(2);
-    }
-    if(evt.data[1]=="Y")
-    {
-      //This converts the string to a number
-      monster.y=1*evt.data.substring(2);
-    }
-  }
+		//Update Character positions
+		try
+		{
+			jsonData = JSON.parse(evt.data);
+			if(jsonData.id==monster.id)
+			{
+				monster=jsonData;
+			}
+			if(jsonData.id==hero.id)
+			{
+				hero=jsonData;
+			}
+		}
+		catch(e)
+		{
+			console.log("error parsing JSON, evt.data =" +evt.data);
+		}
+	};
 };
-
 // Update game objects
 var update = function (modifier) {
   if (38 in keysDown) { // Player holding up
@@ -163,8 +153,7 @@ var update = function (modifier) {
   }
 
 
-  ws.send(player.id+"X"+player.x);
-  ws.send(player.id+"Y"+player.y);
+  ws.send(JSON.stringify(player));
 
 
   // Are they touching?
