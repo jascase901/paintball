@@ -85,48 +85,46 @@ addEventListener("keyup", function (e) {
 
 // Reset the game when the player catches a monster
 var reset = function () {
-  hero.x = canvas.width / 2;
-  hero.y = canvas.height / 2;
+	hero.x = canvas.width / 2;
+	hero.y = canvas.height / 2;
 
-  // Throw the monster somewhere on the screen randomly
-  monster.x = 32 + (Math.random() * (canvas.width - 64));
-  monster.y = 32 + (Math.random() * (canvas.height - 64));
+	// Throw the monster somewhere on the screen randomly
+	monster.x = 32 + (Math.random() * (canvas.width - 64));
+	monster.y = 32 + (Math.random() * (canvas.height - 64));
 };
 player=hero;
 //WebSocket event loop
 ws.onmessage = function (evt) {
-  if(evt.data=="hero"){
-    alert("server chose hero");
-    player = hero;
-  }
-  if (evt.data=="monster"){
-    alert("server chose monster");
-    player = monster;
-  };
-
-  //Update Character positions
-	try
-	{
-		JSON.parse(evt.data);
-
-		jsonData = eval(evt.data);
-		if(jsonData.id==monster.id)
-		{
-			alert("monster")
-			monster=jsonData;
-		}
-		if(jsonData.id==hero.id)
-		{
-			alert("hero")
-			hero=jsonData;
-		}
+	if(evt.data=="hero"){
+		alert("server chose hero");
+		player = hero;
 	}
-	catch(e)
-	{
+	else if (evt.data=="monster"){
+		alert("server chose monster");
+		player = monster;
 	}
- 
+	else
+	{
+
+		//Update Character positions
+		try
+		{
+			jsonData = JSON.parse(evt.data);
+			if(jsonData.id==monster.id)
+			{
+				monster=jsonData;
+			}
+			if(jsonData.id==hero.id)
+			{
+				hero=jsonData;
+			}
+		}
+		catch(e)
+		{
+			console.log("error parsing JSON, evt.data =" +evt.data);
+		}
+	};
 };
-
 // Update game objects
 var update = function (modifier) {
   if (38 in keysDown) { // Player holding up
