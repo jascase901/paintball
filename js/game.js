@@ -55,14 +55,20 @@ monsterImage.src = "images/monster.png";
 // Game objects
 var hero = {
   id : "0",
+  balls:[],
+  paintballcount : 0,
   speed: 256 // movement in pixels per second
 };
 
 var paintball= {
   speed: 256 // movement in pixels per second
 };
-var paintballs= []
-paintballcount = 0;
+paintballs= {
+  id : "3",
+  balls : [],
+  paintballcount : 0
+};
+
 
 
 
@@ -118,6 +124,9 @@ ws.onmessage = function (evt) {
 			{
 				hero=jsonData;
 			}
+      if(jsonData.id==paintballs.id){
+        paintballs =jsonData;
+      }
 		}
 		catch(e)
 		{
@@ -148,34 +157,35 @@ var update = function (modifier) {
     paintball.y = player.y;
 
     //append bullet to bullet list
-    paintballs.push({x: player.x, y: player.y,direction: player.direction});
-    paintballcount++;
+    paintballs.balls.push({x: player.x, y: player.y,direction: player.direction});
+    paintballs.paintballcount++;
   }
 
 
   ws.send(JSON.stringify(player));
+  ws.send(JSON.stringify(paintballs));
 
 
   // Are they touching?
   //This code but with each bullet
-  for(var i=0; i<paintballcount; i++)
+  for(var i=0; i<paintballs.paintballcount; i++)
   {
-    switch(paintballs[i].direction)
+    switch(paintballs.balls[i].direction)
     {
     case DUP:
-      paintballs[i].y-=230*modifier;
+      paintballs.balls[i].y-=230*modifier;
       console.log("up");
       break;
     case DDOWN:
-      paintballs[i].y+=230*modifier;
+      paintballs.balls[i].y+=230*modifier;
       console.log("down");
       break;
     case DLEFT:
-      paintballs[i].x-=230*modifier;
+      paintballs.balls[i].x-=230*modifier;
       console.log("left");
       break;
     case DRIGHT:
-      paintballs[i].x+=230*modifier;
+      paintballs.balls[i].x+=230*modifier;
       console.log("right");
       break;
       defualt:
@@ -184,10 +194,10 @@ var update = function (modifier) {
     }
 
   if (
-    paintballs[i].x <= (monster.x + 15)
-    && monster.x <= (paintballs[i].x + 15)
-    && paintballs[i].y <= (monster.y + 15)
-    && monster.y <= (paintballs[i].y + 15)
+    paintballs.balls[i].x <= (monster.x + 15)
+    && monster.x <= (paintballs.balls[i].x + 15)
+    && paintballs.balls[i].y <= (monster.y + 15)
+    && monster.y <= (paintballs.balls[i].y + 15)
   ) {
     ++monstersCaught;
     // reset();
@@ -208,13 +218,11 @@ var render = function () {
   }
 
   if (paintballReady) {
-    for(var i=0;i<paintballcount;i++)
+    for(var i=0;i<paintballs.paintballcount;i++)
     {
-      ctx.drawImage(paintballImage, paintballs[i].x, paintballs[i].y);
+      ctx.drawImage(paintballImage, paintballs.balls[i].x, paintballs.balls[i].y);
     }
   }
-  //for each in bullet ids 
-  //ctx.drawImage(bulletImage, each.x, each.y);
 
   if (monsterReady) {
     ctx.drawImage(monsterImage, monster.x, monster.y);
