@@ -5,6 +5,27 @@ canvas.width = 512;
 canvas.height = 480;
 document.body.appendChild(canvas);
 
+
+// set the keys that will be used for encryption
+var e = 19;
+
+var p = Math.round(Math.random() * 100);
+while(!isPrime(p) || p % 19 == 0) { p++; }
+
+var q = Math.round(Math.random() * 1000);
+while(!isPrime(p) || p % 19 == 0) { p++; }
+
+n = p * q;
+
+z = (p-1) * (q-1);
+
+var d = 10000;
+while( ((e*d)-1)%z != 1 ) { d++; }
+
+// public key is (n,e)
+// private key is (n,d)
+
+
 DUP=0;
 DDOWN=1;
 DLEFT=2;
@@ -78,7 +99,7 @@ var monster = {
   paintballcount : 0,
   speed: 400
 };
-var monstersCaught = 0;
+var score = 0;
 
 // Handle keyboard controls
 var keysDown = {};
@@ -103,6 +124,7 @@ var reset = function () {
 player=hero;
 //WebSocket event loop
 ws.onmessage = function (evt) {
+  //evt = decrypt(evt);
 	if(evt.data=="hero"){
 		alert("server chose hero");
 		player = hero;
@@ -113,7 +135,6 @@ ws.onmessage = function (evt) {
 	}
 	else
 	{
-
 		//Update Character positions
 		try
 		{
@@ -160,7 +181,7 @@ var update = function (modifier) {
     player.paintballcount++;
   }
 
-
+  
   ws.send(JSON.stringify(player));
 
 
@@ -186,8 +207,8 @@ var update = function (modifier) {
       player.balls[i].x+=230*modifier;
       console.log("right");
       break;
-      defualt:
-      alert("FUCL");
+    default:
+      alert("SOMETHING IS WRONG");
       break;
     }
 
@@ -197,7 +218,7 @@ var update = function (modifier) {
     && player.balls[i].y <= (monster.y + 15)
     && monster.y <= (player.balls[i].y + 15)
   ) {
-    ++monstersCaught;
+    ++score;
     // reset();
   }
 
@@ -235,7 +256,7 @@ var render = function () {
   ctx.font = "24px Helvetica";
   ctx.textAlign = "left";
   ctx.textBaseline = "top";
-  ctx.fillText("Goblins caught: " + monstersCaught, 32, 32);
+  ctx.fillText("Your Score: " + score, 32, 32);
 };
 
 
@@ -250,6 +271,39 @@ var main = function () {
 
   then = now;
 };
+
+function isPrime(num) {
+    for (var i = 2; i < ((num/2)+1); i++) {
+        if(num%i==0)
+            return false;
+    }
+    return true;
+}
+
+function tobit(message) {
+  var output = "";
+  for (i=0; i < message.length; i++) {
+    output += message[i].charCodeAt(0).toString(2) + "";
+  }
+  return output;
+}
+
+function convertToString(bitmessage) {
+  var result = "";
+  for (var i = 0; i < bitmessage.length; i++) {
+    result += String.fromCharCode(parseInt(bitmessage[i], 2));
+  }
+  return result;
+}
+
+function encrypt(message, ee, nn) {
+  return ((message^ee) % nn);
+}
+
+function decrypt(message, dd, nn) {
+  return convertToString((message^dd) % nn);
+}
+
 
 // Let's play this game!
 reset();
